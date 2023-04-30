@@ -15,7 +15,7 @@
     "commands": [
       {
         "command": "vs-capture.helloWorld",
-        "title": "Hello World"
+        "title": "Capture"
       }
     ]
   },

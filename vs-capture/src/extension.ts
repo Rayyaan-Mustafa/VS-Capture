@@ -8,15 +8,42 @@ export function activate(context: vscode.ExtensionContext) {
 
 	// Use the console to output diagnostic information (console.log) and errors (console.error)
 	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, your extension "vs-capture" is now active!');
-
+	console.log('Congratulation, your extension "vs-capture" is now active!');
 	// The command has been defined in the package.json file
 	// Now provide the implementation of the command with registerCommand
 	// The commandId parameter must match the command field in package.json
 	let disposable = vscode.commands.registerCommand('vs-capture.helloWorld', () => {
 		// The code you place here will be executed every time your command is executed
 		// Display a message box to the user
-		vscode.window.showInformationMessage('Hello World from VS-Capture!');
+		vscode.window.showInformationMessage('Editor and terminal text captured to clipboard!');
+	
+		//get active editor text as string
+		let editor = vscode.window.activeTextEditor;
+		//ternary operator to get text or empty string
+		let editorText = editor ? editor.document.getText() : '';
+
+		let terminalText = '';
+		vscode.commands.executeCommand('workbench.action.terminal.selectAll').then(() => {
+			vscode.commands.executeCommand('workbench.action.terminal.copySelection').then(() => {
+			  vscode.commands.executeCommand('workbench.action.terminal.clearSelection').then(() => {
+				vscode.env.clipboard.readText().then((text) => {
+					terminalText = text; 
+					//replace newline characters with actual new lines in editortext and terminaltext
+					editorText = editorText.replace(/\\n/g, '\n');
+					terminalText = terminalText.replace(/\\n/g, '\n');
+
+					//create json string of editortext and terminal text
+					let json = JSON.stringify({editorText, terminalText});
+					console.log("editorText: " + editorText);
+					console.log("terminalText: " + terminalText);
+					//copy json string to clipboard
+					vscode.env.clipboard.writeText("Help me fix the issue in termianlText given the code in editorText: " + json);
+				});
+			  });
+			});
+		  });
+		
+		
 	});
 
 	context.subscriptions.push(disposable);
